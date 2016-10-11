@@ -5,7 +5,61 @@
 		<title>AngularJS • TodoMVC</title>
 		<link rel="stylesheet" href="node_modules/todomvc-common/base.css">
 		<link rel="stylesheet" href="node_modules/todomvc-app-css/index.css">
-		<style>[ng-cloak] { display: none; }</style>
+		<link rel="stylesheet" href="lib/angular-datepicker/themes/default.css">
+		<link rel="stylesheet" href="lib/angular-datepicker/themes/default.date.css">
+		<style>
+			[ng-cloak] { display: none; }
+
+			#todo-list li label {
+				display: flex;
+				justify-content: space-around;
+				align-items: center;
+			}
+
+			.todo_severity {
+				margin-left: auto;
+				padding-left: 8px;
+				font-size: 14px;
+				word-break: normal;
+			}
+
+			#todo-list li.editing .edit {
+				padding: 13px 57px 12px 17px;
+			}
+
+			.edit-severity {
+				display: none;
+				position: absolute;
+				top: 20px;
+				right: 10px;
+			}
+
+			.editing .edit-severity { display: block; }
+
+			.completed-time {
+				margin: 5px 0 5px 60px;
+				font-size: 14px;
+			}
+
+			.edit-date-wrapper {
+				display: none;
+				align-items: center;
+				justify-content: flex-start;
+			}
+			.editing .edit-date-wrapper {
+				display: flex;
+			}
+			#todo-list .edit-date-wrapper label {
+				font-size: 14px;
+				text-decoration: none !important;
+				padding: 5px;
+			}
+
+			.edit-date {
+				margin: 5px;
+				padding: 5px;
+			}
+		</style>
 	</head>
 	<body ng-app="todomvc">
 		<ng-view />
@@ -25,11 +79,28 @@
 						<li ng-repeat="todo in todos | filter:statusFilter track by $index" ng-class="{completed: todo.completed, editing: todo == editedTodo}">
 							<div class="view">
 								<input class="toggle" type="checkbox" ng-model="todo.completed" ng-change="toggleCompleted(todo)">
-								<label ng-dblclick="editTodo(todo)">{{todo.title}}</label>
+								<label ng-dblclick="editTodo(todo)">
+									<span class="todo_title">{{todo.title}}</span>
+									<span class="todo_severity">{{todo.severity}}</span>
+								</label>
 								<button class="destroy" ng-click="removeTodo(todo)"></button>
+								<p class="completed-time" ng-if="todo.completed">Completed on {{ todo.completed_date }}</p>
 							</div>
 							<form ng-submit="saveEdits(todo, 'submit')">
-								<input class="edit" ng-trim="false" ng-model="todo.title" todo-escape="revertEdits(todo)" ng-blur="saveEdits(todo, 'blur')" todo-focus="todo == editedTodo">
+								<input class="edit" ng-trim="false" ng-model="todo.title" todo-escape="revertEdits(todo)" todo-focus="todo == editedTodo">
+								<select class="edit-severity" ng-model="todo.severity" todo-escape="revertEdits(todo)">
+									<option value="Low">Low</option>
+									<option value="Medium">Medium</option>
+									<option value="High">High</option>
+								</select>
+
+								<div class="edit-date-wrapper" ng-if="todo.completed">
+									<label for="edit-date">Completed date:</label>
+									<input id="edit-date" type="text" class="edit-date" pick-a-date="date" pick-a-date-options="{ format: 'yyyy-mm-dd' }" placeholder="Select date" ng-model="todo.completed_date">
+								</div>
+
+								<!-- Hidden submit button allows NG to submit the form on Enter keydown -->
+								<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
 							</form>
 						</li>
 					</ul>
@@ -72,5 +143,7 @@
 		<script src="js/services/todoStorage.js"></script>
 		<script src="js/directives/todoFocus.js"></script>
 		<script src="js/directives/todoEscape.js"></script>
+		<script src="lib/angular-datepicker/angular-datepicker.js"></script>
+
 	</body>
 </html>

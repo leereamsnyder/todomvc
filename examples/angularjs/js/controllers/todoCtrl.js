@@ -31,7 +31,9 @@ angular.module('todomvc')
 		$scope.addTodo = function () {
 			var newTodo = {
 				title: $scope.newTodo.trim(),
-				completed: false
+				completed: false,
+				severity: 'Medium',
+				completed_date: '',
 			};
 
 			if (!newTodo.title) {
@@ -72,7 +74,7 @@ angular.module('todomvc')
 
 			todo.title = todo.title.trim();
 
-			if (todo.title === $scope.originalTodo.title) {
+			if (todo.title === $scope.originalTodo.title && todo.severity === $scope.originalTodo.severity && todo.completed_date === $scope.originalTodo.completed_date) {
 				$scope.editedTodo = null;
 				return;
 			}
@@ -105,6 +107,16 @@ angular.module('todomvc')
 			if (angular.isDefined(completed)) {
 				todo.completed = completed;
 			}
+			if (todo.completed && ! todo.completed_date) {
+				var date = new Date(Date.now());
+				var year = date.getFullYear();
+				var month = date.getMonth() + 1;
+				var day = date.getDate();
+				todo.completed_date = year + '-' + month + '-' + day;
+			}
+			if (! todo.completed) {
+				todo.completed_date = '';
+			}
 			store.put(todo, todos.indexOf(todo))
 				.then(function success() {}, function error() {
 					todo.completed = !todo.completed;
@@ -122,4 +134,5 @@ angular.module('todomvc')
 				}
 			});
 		};
+
 	});
